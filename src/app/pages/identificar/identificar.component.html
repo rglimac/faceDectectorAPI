@@ -1,0 +1,34 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6" style="margin-top: 150px;">
+      <div class="jumbotron bg-dark text-white text-center">
+        <h3><i class="fa fa-video-camera" aria-hidden="true"></i> Identificación</h3>
+        <hr class="my-4">
+        <button type="button" class="btn btn-success" (click)="deteccion()">Identificar</button>
+        <div class="card text-white bg-dark mt-3">
+          <div class="card-header bg-secondary">Cámara de identificación</div>
+          <div class="card-body p-0 position-relative">
+            <video
+              width="640"
+              height="480"
+              autoplay
+              muted
+              class="position-absolute top-0 start-0"
+              style="visibility: hidden; opacity: 0;"
+              #videoContainer
+            ></video>
+            <canvas
+              width="640"
+              height="480"
+              class="js-canvas w-100"
+              #myCanvas
+            ></canvas>
+          </div>
+        </div>
+        <div *ngIf="detectedName" class="alert alert-info mt-3">
+          Persona identificada: {{ detectedName }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

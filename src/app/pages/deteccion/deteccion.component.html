@@ -1,0 +1,28 @@
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-4"></div>
+        <div class="col-4" style="margin-top: 90px;">
+
+            <div class="card bg-dark" style="color: white">
+                <div class="header text-center">
+                  {{imgNombre | uppercase}}
+                </div>
+                <img [src]="imgFoto" class="img-card-top">
+                <div class="card-body text-center">
+                 
+                    <button type="button" class="btn btn-danger" (click)="volver()" >Volver</button>
+                 
+                </div>
+            </div>
+
+        </div>
+        <div class="col-4"></div>
+
+
+    </div>
+
+
+</div>
+

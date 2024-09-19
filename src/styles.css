@@ -1,0 +1,54 @@
+/* You can add global styles to this file, and also import other style files */
+.status {
+    color: white;
+}
+
+
+
+.images-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.imageContainer {
+    border: 1px solid white;
+    width: 180px;
+    padding: 1px;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.cerrar {
+    text-decoration: none;
+    margin-left: 130px;
+    padding-top: -30px;
+    color: white;
+    cursor: pointer;
+}
+
+a {
+    transition: all 0.5s;
+}
+
+a:hover {
+    color: rgb(148, 7, 7);
+    text-decoration: none;
+}
+
+.status {
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    bottom: 50%;
+    margin: auto;
+    z-index: 3;
+    font-size: 20px;
+    font-weight: bold
+}

@@ -1,0 +1,56 @@
+<h1 style="text-align: center">Subir rostros y procesarlos</h1>
+
+<hr>
+
+<div style="text-align: center">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5" style="position: relative;">
+
+                <div class="card text-white bg-dark">
+
+                    <div class="card-header bg-secondary" #imageFile>Subir Imagen</div>
+
+                    <div class="card-body">
+                        <img class="img-fluid" [src]="imgURL" class="card-img-top">
+                        <hr style="border-color:azure">
+                        <form (ngSubmit)="onSubmit()" [formGroup]="imagenesForm " >
+                            <div class="form-group">
+                                <input type="file" class="form-control-file" formControlName="imgFile" class="form-control-file"
+                                    formControlName="imgFile" accept="image/*" (change)="selectImage($event)">
+                                <button type="submit" class="btn btn-outline-secondary mt-3" [disabled]="btnActive">Cargar Imagen</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card text-white bg-dark mb-3">
+                        <div class="card-header bg-secondary">Rostros Procesados</div>
+                        <table class="table table-hover table-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Imagen</th>
+                                    <th scope="col">Datos</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let imagen of imagenesData">
+                                    <td><img [src]="imagen.imgUrl" width="100" class="zoom"></td>
+                                    <td>{{imagen.nombreImagen}}</td>
+                                    <td><button class="btn btn-danger btn-sm" (click)="eliminar(imagen.id, imagen.nombreImagen)" ><i class="fa fa-trash"></i> </button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "faceapp-42cc7",
+    "faceID": "faceapp-42cc7"
+  },
+  "targets": {
+    "deteccionfaceapi": {
+      "hosting": {
+        "deteccionFacial": [
+          "deteccionfaceapi"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
