@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import * as faceapi from 'face-api.js';
 import { ImagenesService } from 'src/app/services/imagenes.service';
 import { ProcessFaceService } from 'src/app/services/process-face.service';
@@ -8,7 +8,7 @@ import { ProcessFaceService } from 'src/app/services/process-face.service';
   templateUrl: './identificar.component.html',
   styleUrls: ['./identificar.component.css']
 })
-export class IdentificarComponent implements OnInit {
+export class IdentificarComponent implements OnInit, OnDestroy {
   @ViewChild('videoContainer', { static: true }) videoContainer!: ElementRef;
   @ViewChild('myCanvas', { static: true }) myCanvas!: ElementRef;
 
@@ -16,6 +16,10 @@ export class IdentificarComponent implements OnInit {
   public context!: CanvasRenderingContext2D;
   labeledDescriptors: any[] = [];
   detectedName: string = '';
+  detectedBirthdate: string = ''; // Nueva propiedad
+  detectedEmergencyContact: string = ''; // Nueva propiedad
+  detectedId: string = ''; // Nueva propiedad
+  private videoStream: MediaStream | null = null;
 
   constructor(private imagenesSvc: ImagenesService, private processSvc: ProcessFaceService) { }
 
@@ -23,13 +27,15 @@ export class IdentificarComponent implements OnInit {
     this.startCamera();
   }
 
+  ngOnDestroy(): void {
+    this.stopCamera();
+  }
 
-  //Inicia la camara
   startCamera = async () => {
     this.context = this.myCanvas.nativeElement.getContext('2d');
-    const video = await navigator.mediaDevices.getUserMedia({ video: true });
+    this.videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
     const stream = this.videoContainer.nativeElement;
-    stream.srcObject = video;
+    stream.srcObject = this.videoStream;
 
     const reDraw = async () => {
       this.context.drawImage(stream, 0, 0, 640, 480);
@@ -39,12 +45,18 @@ export class IdentificarComponent implements OnInit {
     requestAnimationFrame(reDraw);
   }
 
-//Aqui me llama al metodo de abajo
+  stopCamera = () => {
+    if (this.videoStream) {
+      this.videoStream.getTracks().forEach(track => track.stop());
+      this.videoStream = null;
+    }
+    this.videoContainer.nativeElement.srcObject = null;
+  }
+
   deteccion() {
     this.loadModelsAndDetect();
   }
 
-//Aqui cargo los modelos del face-api y me realiza la deteccion e identificacion con el video en tiempo real
   loadModelsAndDetect = async () => {
     await faceapi.nets.tinyFaceDetector.loadFromUri('/assets/models');
     await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models');
@@ -62,6 +74,11 @@ export class IdentificarComponent implements OnInit {
       const bestMatch = this.processSvc.matchDescriptor(detection.descriptor);
       if (bestMatch) {
         this.detectedName = bestMatch.label;
+        // Asignar los datos adicionales
+        this.detectedBirthdate = bestMatch.fechaNacimiento || 'No disponible';
+        this.detectedEmergencyContact = bestMatch.tlfEmergencia || 'No disponible';
+        this.detectedId = bestMatch.cedula || 'No disponible';
+
         this.context.font = "20px Arial";
         this.context.fillStyle = "red";
         this.context.fillText(this.detectedName, detection.detection.box.x, detection.detection.box.y - 10);
@@ -71,8 +88,6 @@ export class IdentificarComponent implements OnInit {
     setInterval(processFace, 2000);
   }
 
-
-//Aqui me pasa el nombre de la imagen que ha identificado dentro del video de la camara en tiempo real.
   imagesLista() {
     this.imagenesSvc.getImagenes().subscribe((res: any) => {
       this.imagenes = res;
@@ -80,7 +95,7 @@ export class IdentificarComponent implements OnInit {
         const imageElement = document.createElement('img');
         imageElement.src = imagen.imgUrl;
         imageElement.crossOrigin = 'anonymous';
-        return this.processSvc.processFace(imageElement, imagen.nombreImagen);  // Pasar el nombre de la imagen en lugar del ID
+        return this.processSvc.processFace(imageElement, imagen.nombreImagen, imagen.fechaNacimiento, imagen.tlfEmergencia, imagen.cedula);  // Pasar solo el nombre de la imagen
       });
     });
   }

@@ -26,7 +26,10 @@
           </div>
         </div>
         <div *ngIf="detectedName" class="alert alert-info mt-3">
-          Persona identificada: {{ detectedName }}
+          Persona identificada: {{ detectedName }}<br>
+          Fecha de Nacimiento: {{ detectedBirthdate }}<br>
+          Teléfono de Emergencia: {{ detectedEmergencyContact }}<br>
+          Cédula: {{ detectedId }}          
         </div>
       </div>
     </div>

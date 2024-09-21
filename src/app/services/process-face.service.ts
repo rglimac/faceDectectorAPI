@@ -11,7 +11,7 @@ export class ProcessFaceService {
 
   constructor() { }
 
-  async processFace(image: any, nombreImagen: string) {
+  async processFace(image: any, nombreImagen: string, fechaNacimiento: string, tlfEmergencia: string, cedula: string) {
     await faceapi.nets.tinyFaceDetector.loadFromUri('/assets/models');
     await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models');
     await faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models');
@@ -24,6 +24,9 @@ export class ProcessFaceService {
 
     this.imageDescriptors.push({
       id: nombreImagen,  // Usar el nombre de la imagen en lugar del ID
+      fechaNacimiento,
+      tlfEmergencia,
+      cedula,
       detection
     });
 
@@ -38,8 +41,17 @@ export class ProcessFaceService {
 
   matchDescriptor(descriptor: Float32Array) {
     if (this.faceMatcher) {
-      return this.faceMatcher.findBestMatch(descriptor);
+      const bestMatch = this.faceMatcher.findBestMatch(descriptor);
+      const matchDescriptor = this.imageDescriptors.find((d: { id: string }) => d.id === bestMatch.label);
+      
+      return { 
+        label: bestMatch.label,
+        fechaNacimiento: matchDescriptor?.fechaNacimiento, 
+        tlfEmergencia: matchDescriptor?.tlfEmergencia,
+        cedula: matchDescriptor?.cedula 
+      };
     }
     return null;
   }
+  
 }

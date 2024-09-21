@@ -81,7 +81,10 @@ progress:any;
         this.guardarImagen({
 
           nombreImagen:imagesData.nombreImagen,
-          imgUrl:item.url
+          imgUrl:item.url,
+          fechaNacimiento:imagesData.fechaNacimiento,
+          tlfEmergencia:imagesData.tlfEmergencia,
+          cedula:imagesData.cedula
 
         });
 
@@ -94,7 +97,7 @@ progress:any;
   }
 
 
-  async guardarImagen(imagen:{nombreImagen:string, imgUrl:string}):Promise<any>{
+  async guardarImagen(imagen:{nombreImagen:string, imgUrl:string, fechaNacimiento:string, tlfEmergencia:string, cedula:string}):Promise<any>{
 
 
     try {
