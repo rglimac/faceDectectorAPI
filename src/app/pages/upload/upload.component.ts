@@ -100,7 +100,7 @@ export class UploadComponent implements OnInit {
     this.http.get(`${this.apiUrl}/reload-models`).subscribe(
       (response) => {
         console.log('Modelos recargados correctamente:', response);
-        
+
         // Mostrar mensaje de éxito
         Swal.fire({
           icon: 'success',
@@ -110,7 +110,7 @@ export class UploadComponent implements OnInit {
       },
       (error) => {
         console.error('Error al recargar los modelos:', error);
-        
+
         // Mostrar mensaje de éxito, sin importar el error
         Swal.fire({
           icon: 'success',
@@ -120,10 +120,10 @@ export class UploadComponent implements OnInit {
       }
     );
   }
-  
-  
-  
-  
+
+
+
+
   processFace = async (image: any, imageContainer: any) => {
 
     await faceapi.nets.tinyFaceDetector.loadFromUri('/assets/models');
@@ -175,15 +175,14 @@ export class UploadComponent implements OnInit {
   }
 
   onSubmit() {
-
     // Pedir múltiples entradas
     Swal.fire({
       title: 'Introducir los datos',
       html:
         `<input id="nombreImagen" class="swal2-input" placeholder="Nombre de la imagen">` +
-        `<input id="fechaNacimiento" class="swal2-input" placeholder="Fecha de nacimiento (dd/mm/yyyy)">` +
-        `<input id="tlfEmergencia" class="swal2-input" placeholder="Teléfono de emergencia">` +
-        `<input id="cedula" class="swal2-input" placeholder="Cédula">`,
+        `<input type="date" id="fechaNacimiento" class="swal2-input" placeholder="Fecha de nacimiento">` +
+        `<input id="tlfEmergencia" class="swal2-input" placeholder="Teléfono de emergencia" maxlength="10">` +
+        `<input id="cedula" class="swal2-input" placeholder="Cédula" maxlength="10">`,
       focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: 'Guardar',
@@ -192,23 +191,46 @@ export class UploadComponent implements OnInit {
         const fechaNacimiento = (document.getElementById('fechaNacimiento') as HTMLInputElement).value;
         const tlfEmergencia = (document.getElementById('tlfEmergencia') as HTMLInputElement).value;
         const cedula = (document.getElementById('cedula') as HTMLInputElement).value;
-  
+
+        // Validaciones
         if (!nombreImagen || !fechaNacimiento || !tlfEmergencia || !cedula) {
           Swal.showValidationMessage('Todos los campos son obligatorios');
           return false;
         }
-  
+
+        // Validación del teléfono y cédula
+        if (tlfEmergencia.length !== 10 || isNaN(Number(tlfEmergencia))) {
+          Swal.showValidationMessage('El teléfono debe tener 10 dígitos numéricos.');
+          return false;
+        }
+
+        if (cedula.length !== 10 || isNaN(Number(cedula))) {
+          Swal.showValidationMessage('La cédula debe tener 10 dígitos numéricos.');
+          return false;
+        }
+
         return {
           nombreImagen,
           fechaNacimiento,
           tlfEmergencia,
           cedula
         };
+      },
+      willOpen: () => {
+        // Agregar eventos para restringir la entrada
+        const tlfInput = document.getElementById('tlfEmergencia') as HTMLInputElement;
+        const cedulaInput = document.getElementById('cedula') as HTMLInputElement;
+
+        tlfInput.addEventListener('input', () => {
+          tlfInput.value = tlfInput.value.replace(/[^0-9]/g, '');
+        });
+
+        cedulaInput.addEventListener('input', () => {
+          cedulaInput.value = cedulaInput.value.replace(/[^0-9]/g, '');
+        });
       }
     }).then((result) => {
-  
       if (result.isConfirmed && result.value) {
-  
         // Crear el objeto con los datos recogidos
         let cargarImagenDatos: any = {
           nombreImagen: result.value.nombreImagen,
@@ -216,22 +238,19 @@ export class UploadComponent implements OnInit {
           tlfEmergencia: result.value.tlfEmergencia,
           cedula: result.value.cedula
         };
-  
+
         // Llamar al servicio para cargar los datos
         this.imagenesSvc.cargarImagenesFirebase(this.imagen, cargarImagenDatos);
-  
+
         Swal.fire({
           icon: 'success',
           title: 'Los datos fueron guardados',
           text: 'En breve aparecerá la imagen y los datos guardados'
-        }).then((result) => {
-  
-          if (result) {
-            this.imgURL = '../../../assets/img/noimage.png';
-            this.imagenesForm.reset();
-          }
-  
+        }).then(() => {
+          this.imgURL = '../../../assets/img/noimage.png';
+          this.imagenesForm.reset();
         });
+
       } else {
         Swal.fire({
           icon: 'error',
@@ -242,11 +261,10 @@ export class UploadComponent implements OnInit {
           this.imagenesForm.reset();
         });
       }
-  
     });
   }
-  
 
+  //ELIMINAR
 
   eliminar(id: any, nombreImagen: string) {
 
@@ -263,12 +281,104 @@ export class UploadComponent implements OnInit {
         this.imagenesSvc.eliminarImagen(id, nombreImagen);
       }
     })
+  }
 
+  //VALIDACIONES
+  private validateEditInputs() {
+    const nuevoNombreImagen = (document.getElementById('nombreImagen') as HTMLInputElement).value;
+    const nuevaFechaNacimiento = (document.getElementById('fechaNacimiento') as HTMLInputElement).value;
+    const nuevoTlfEmergencia = (document.getElementById('tlfEmergencia') as HTMLInputElement).value;
+    const nuevaCedula = (document.getElementById('cedula') as HTMLInputElement).value;
 
+    // Validaciones
+    if (!nuevoNombreImagen || !nuevaFechaNacimiento || !nuevoTlfEmergencia || !nuevaCedula) {
+      Swal.showValidationMessage('Todos los campos son obligatorios');
+      return false;
+    }
 
+    // Validación del teléfono y cédula
+    if (nuevoTlfEmergencia.length !== 10 || isNaN(Number(nuevoTlfEmergencia))) {
+      Swal.showValidationMessage('El teléfono debe tener 10 dígitos numéricos.');
+      return false;
+    }
+
+    if (nuevaCedula.length !== 10 || isNaN(Number(nuevaCedula))) {
+      Swal.showValidationMessage('La cédula debe tener 10 dígitos numéricos.');
+      return false;
+    }
+
+    return {
+      nuevoNombreImagen,
+      nuevaFechaNacimiento,
+      nuevoTlfEmergencia,
+      nuevaCedula,
+    };
+  }
+
+  private addInputValidation() {
+    const tlfInput = document.getElementById('tlfEmergencia') as HTMLInputElement;
+    const cedulaInput = document.getElementById('cedula') as HTMLInputElement;
+
+    tlfInput.addEventListener('input', () => {
+      tlfInput.value = tlfInput.value.replace(/[^0-9]/g, '');
+    });
+
+    cedulaInput.addEventListener('input', () => {
+      cedulaInput.value = cedulaInput.value.replace(/[^0-9]/g, '');
+    });
   }
 
 
+  // EDITAR
+  editar(id: string | undefined, nombreImagen: string, fechaNacimiento: string, tlfEmergencia: string, cedula: string, fotoUrl: string) {
+    if (!id) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El ID no puede estar vacío.',
+      });
+      return;
+    }
 
+    // Lógica para editar los datos
+    Swal.fire({
+      title: 'Editar datos',
+      html:
+        `<img id="originalImage" src="${fotoUrl}" alt="Imagen original" style="max-width: 100%; max-height: 150px; object-fit: contain; margin-bottom: 10px; display: block; margin: 0 auto;">` + // Mostrar la foto original
+        `<input id="nombreImagen" class="swal2-input" value="${nombreImagen}" placeholder="Nombre de la imagen">` +
+        `<input type="date" id="fechaNacimiento" class="swal2-input" value="${fechaNacimiento}" placeholder="Fecha de nacimiento">` +
+        `<input id="tlfEmergencia" class="swal2-input" value="${tlfEmergencia}" placeholder="Teléfono de emergencia" maxlength="10">` +
+        `<input id="cedula" class="swal2-input" value="${cedula}" placeholder="Cédula" maxlength="10">`,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar',
+      preConfirm: () => {
+        return this.validateEditInputs();
+      },
+      willOpen: () => {
+        // Agregar eventos para restringir la entrada
+        this.addInputValidation();
 
+        // Evento para mostrar la imagen seleccionada AQUI
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        let cargarImagenDatos: any = {
+          nombreImagen: result.value.nuevoNombreImagen,
+          fechaNacimiento: result.value.nuevaFechaNacimiento,
+          tlfEmergencia: result.value.nuevoTlfEmergencia,
+          cedula: result.value.nuevaCedula
+        };
+
+        // Aquí llamas al servicio para actualizar la imagen
+        this.imagenesSvc.actualizarImagen(id, cargarImagenDatos);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Datos actualizados',
+          text: 'Los datos fueron actualizados correctamente.'
+        });
+      }
+    });
+  }
 }

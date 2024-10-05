@@ -57,9 +57,19 @@
                                     <td>{{imagen.fechaNacimiento}}</td>
                                     <td>{{imagen.tlfEmergencia}}</td>
                                     <td>{{imagen.cedula}}</td>
-                                    <td><button class="btn btn-danger btn-sm"
-                                            (click)="eliminar(imagen.id, imagen.nombreImagen)"><i
-                                                class="fa fa-trash"></i> </button></td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm"
+                                            (click)="eliminar(imagen.id, imagen.nombreImagen)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm"
+                                            (click)="editar(imagen.id, imagen.nombreImagen, imagen.fechaNacimiento, imagen.tlfEmergencia, imagen.cedula, imagen.imgUrl)">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+
+                                    </td>
+
+
                                 </tr>
                             </tbody>
                         </table>
